@@ -3,8 +3,8 @@ import warnings
 from django.template import loader
 from django.utils.deprecation import RenameMethodsBase
 
-from .. import compat, utils
 from . import filters, filterset
+from .. import compat, utils
 
 
 # TODO: remove metaclass in 2.1
@@ -166,5 +166,11 @@ class DjangoFilterBackend(metaclass=RenameAttributes):
             }
             if field.extra and 'choices' in field.extra:
                 parameter['schema']['enum'] = [c[0] for c in field.extra['choices']]
+            if isinstance(field, filters.NumberFilter):
+                parameter['schema']['type'] = 'number'
+            if isinstance(field, filters.DateFilter):
+                parameter['schema']['format'] = 'date'
+            elif isinstance(field, filters.DateTimeFilter):
+                parameter['schema']['format'] = 'date-time'
             parameters.append(parameter)
         return parameters
